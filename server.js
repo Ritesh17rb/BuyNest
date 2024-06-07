@@ -18,14 +18,27 @@ connectDB();
 const app = express();
 
 // Middlewares
+
+// Add custom CORS middleware before other middlewares and routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200); // Respond OK to preflight requests
+  }
+  next();
+});
+
+// Using CORS middleware with specific options
 const corsOptions = {
   origin: ['https://buynest-seven.vercel.app', 'https://buynest-2ccye0skj-riteshs-projects-58a4d698.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
-  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
 };
-
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(morgan('dev'));
 
