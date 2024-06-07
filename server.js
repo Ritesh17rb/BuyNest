@@ -19,25 +19,27 @@ const app = express();
 
 // Middlewares
 
-// Add custom CORS middleware before other middlewares and routes
+// Universal CORS configuration
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200,
+}));
+
+// Middleware to log requests and handle preflight OPTIONS requests
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  console.log(`Handling ${req.method} request to ${req.url}`);
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   if (req.method === 'OPTIONS') {
+    console.log('Responding to preflight request');
     return res.sendStatus(200); // Respond OK to preflight requests
   }
   next();
 });
-
-// Using CORS middleware with specific options
-const corsOptions = {
-  origin: ['https://buynest-seven.vercel.app', 'https://buynest-2ccye0skj-riteshs-projects-58a4d698.vercel.app'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
-};
-app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(morgan('dev'));
